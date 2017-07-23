@@ -1,13 +1,5 @@
----
-title: "Practical Machine Learning Course Project"
-date: "July-2017"
-output: 
-    html_document:
-
-      df_print: kable
-      keep_md: yes
-      theme: cerulean
----
+# Practical Machine Learning Course Project
+July-2017  
 ### EXECUTIVE SUMMARY
 The objective of this project is to devise a machine learning model that can predict the manner in which a weight lifting exercise was performed based on data collected from wearable sensors on the belt, arm, forearm, and dumbell.  
 
@@ -26,16 +18,7 @@ Class C - incorrect manner, lifting dumbbell only halfway
 Class D - incorrect manner, lowering dumbbell only halfway  
 Class E - incorrect manner, throwing hip to the front  
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
 
-library(caret)
-library(parallel)
-library(doParallel)
-library(data.table)
-library(knitr)
-
-```
 
 ### DATA PROCESSING
 #### Load Training Dataset
@@ -43,23 +26,15 @@ library(knitr)
 Download given WLE training dataset from :-  
 https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv  
 
-```{r}
-if(!file.exists("../../course_data/pml-training.csv")) {
-    fileurl1<-
-        "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
-    download.file(fileurl1, 
-                  destfile= "../../course_data/pml-training.csv")
-}
 
-# Read in given data
-pmltrn<-data.table(read.csv("../../course_data/pml-training.csv"))
+```
+## [1] 19622   160
+```
 
-# Dimensions of original training data 
-dim(pmltrn)
-
-# Distribution of outcome variable
-table(pmltrn$classe)
-
+```
+## 
+##    A    B    C    D    E 
+## 5580 3797 3422 3216 3607
 ```
 
 #### Data Exploration
@@ -78,28 +53,7 @@ As such, variables with the following criteria were excluded as predictors from 
 * variables that are labels and have no relationship with the outcome
 
 
-```{r}
 
-# Identify variables with no variability
-Zerovars<-colnames(pmltrn)[nearZeroVar(pmltrn)]
-
-# Identify columns with more than 70% NAs 
-NAcnt<-colSums(is.na(pmltrn))
-NAcol<-NAcnt>0.7*nrow(pmltrn)
-NAvars<-names(NAcnt[NAcol])
-
-# Identify label variables that are not predictors of outcome
-Labvars<-colnames(pmltrn[,1:7])
-
-# Consolidate list of variables to be excluded from modeling
-Delvars<-append(Labvars,Zerovars)
-Delvars<-append(Delvars,NAvars)
-
-# Build new training dataset with selected features
-rqdvars<-colnames(pmltrn)[!(colnames(pmltrn) %in% Delvars)]
-pmltrn1<-subset(pmltrn, select=rqdvars)
-
-```
 
 At the end of the feature selection exercise, 52 variables remained to be used for predictor selection in the modelling algorithms. 
 
@@ -109,14 +63,7 @@ At the end of the feature selection exercise, 52 variables remained to be used f
 
 * In the model training function, a 5-fold cross-validation is being use3d. 
 
-```{r}
-# Partition training dataset
-set.seed(98765)
-inTrain <- createDataPartition(y=pmltrn1$classe,p=0.75,list=FALSE)
-trndat <- pmltrn1[inTrain,]
-valdat <- pmltrn1[-inTrain,]
 
-```
 
 ### MODELLING
 
@@ -127,40 +74,40 @@ The caret::train function will be used to build the models.
 
 To improve processing time, parallel processing function will be initiated for the model training process as per guidance from Len Greski (course mentor) *[2]* 
 
-```{r cache=TRUE}
-cluster <- makeCluster(detectCores() - 1)
-registerDoParallel(cluster)
 
-fitctrl<-trainControl(method="cv",number=5,allowParallel=TRUE)
+```
+##    user  system elapsed 
+##   75.23    4.39  449.91
+```
 
-system.time({
-set.seed(98765)
-fit1<-train(classe~.,data=trndat,method="gbm",trControl=fitctrl,
-            verbose=FALSE)
-})
-
-system.time({
-set.seed(98765)
-fit2<-train(classe~.,data=trndat,method="rf",trControl=fitctrl)
-})
-
-stopCluster(cluster)
-registerDoSEQ()
-
+```
+##    user  system elapsed 
+##  311.78    4.75 2257.50
 ```
 
 #### 2. Evaluation of model fits
 
-```{r}
-
-# Compare models
-cm1<-confusionMatrix(valdat$classe,predict(fit1,valdat))
-cm2<-confusionMatrix(valdat$classe,predict(fit2,valdat))
-cmres<-resamples(list(GBM=fit1, RF=fit2))
-summary(cmres)
-bwplot(cmres,main="Resampling accuracy comparison")
 
 ```
+## 
+## Call:
+## summary.resamples(object = cmres)
+## 
+## Models: GBM, RF 
+## Number of resamples: 5 
+## 
+## Accuracy 
+##          Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA's
+## GBM 0.9616168 0.9622706 0.9636549 0.9631742 0.9639823 0.9643463    0
+## RF  0.9894737 0.9908226 0.9925272 0.9921187 0.9932065 0.9945634    0
+## 
+## Kappa 
+##          Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA's
+## GBM 0.9514280 0.9522673 0.9540314 0.9534099 0.9544351 0.9548876    0
+## RF  0.9866841 0.9883896 0.9905476 0.9900302 0.9914064 0.9931231    0
+```
+
+![](index_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
 Summary and plot of resampling results show the RF model provides higher accuracy rates with a maximum of 0.994 as opposed to GBM at 0.964.
 
@@ -168,22 +115,37 @@ Confusion matrix for prediction on validation data
 
 **GBM model :-**  
 
-`r kable(cm1$table)`  
+
+
+         A     B     C     D     E
+---  -----  ----  ----  ----  ----
+A     1368    20     3     3     1
+B       26   902    20     0     1
+C        0    22   814    17     2
+D        1    11    27   757     8
+E        0    13     9    16   863
+
+  
 
 **RF model :-**  
 
-`r kable(cm2$table)`  
+
+
+         A     B     C     D     E
+---  -----  ----  ----  ----  ----
+A     1390     4     1     0     0
+B        5   942     2     0     0
+C        0     2   849     4     0
+D        0     1     4   798     1
+E        0     1     0     0   900
+
+  
 
 
 #### 3. Chosen model
 The better model to use for prediction in this case is the Random Forest algorithm as it gives a higher accuracy rate.  
 
-```{r}
-
-# Show final model plot
-plot(fit2,main="Random Forest model",lwd=2)
-
-```
+![](index_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
 ### CONCLUSIONS
 The final machine learning model selected for use was the one built with the __*Random Forest*__ algorithm having an __*out of sample error rate*__ at __*0.51%*__.  
