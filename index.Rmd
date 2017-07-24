@@ -13,11 +13,11 @@ The objective of this project is to devise a machine learning model that can pre
 
 The plan of approach is to build 2 models for comparison and choose the one with higher accuracy as the final model to be used to predict the 20 test cases provided as part of the project.
 
-It was eventually found that the RF (Random Forest) model performed better than the one built with GBM (Stochastic Gradient Boosting) and was able to give 100% correct predictions on the __*classe*__ outcome for the given 20 test cases.  
+It is eventually found that the RF (Random Forest) model performed better than the one built with GBM (Stochastic Gradient Boosting) and was able to give 100% correct predictions on the __*classe*__ outcome for the given 20 test cases.  
 
 
 ### BACKGROUND
-An abstract of the Weight Lifting Exercises (WLE) dataset was used for this supervised machine learning project. It is provided courtesy of the Human Activity Recognition research by Velloso, E.; Bulling, A.; Gellersen, H.; Ugulino, W.; Fuks, H. as part of the proceedings of 4th International Conference in Cooperation with SIGCHI (Augmented Human '13). *[1]*
+An abstract of the Weight Lifting Exercises (WLE) dataset is used for this supervised machine learning project. It is provided courtesy of the Human Activity Recognition research by Velloso, E.; Bulling, A.; Gellersen, H.; Ugulino, W.; Fuks, H. as part of the proceedings of 4th International Conference in Cooperation with SIGCHI (Augmented Human '13). *[1]*
 
 The WLE aspect of the research employed an on-body sensing approach to collect angles, accelerometric, gyroscopic & magnetometric measurements data from 6 participants while they performed the unilateral dumbbell biceps curl exercise. They were directed to do barbell lifts correctly and incorrectly in 5 different ways and the manner in which the exercise was executed was then classified accordingly as data was being collected :-  
 Class A - correct method according to execution specifications  
@@ -27,7 +27,7 @@ Class D - incorrect manner, lowering dumbbell only halfway
 Class E - incorrect manner, throwing hip to the front  
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
+knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE)
 
 library(caret)
 library(parallel)
@@ -63,19 +63,19 @@ table(pmltrn$classe)
 ```
 
 #### Data Exploration
-* The training dataset comprised of 160 variable columns with 19622 rows. 
-* The outcome variable is __*classe*__. So there are 159 potential predictors.  
+* The training dataset comprises of 160 variable columns with 19622 rows. 
+* The outcome variable is __*classe*__ along with 159 potential predictors.  
 * The table above shows the distribution of the different classe values occurring in the training dataset
-* Although there were no missing classifications of the classe outcome variable, a visual overview of the dataset however showed high incidence of missing or NA values in many of the predictor columns.  
+* Although there are no missing classifications of the classe outcome variable, a visual overview of the dataset however shows high incidence of missing or NA values in many of the predictor columns.  
   
 
 #### Features Selection
 Originally the intent was to model using classification algorithms like GBM and RF and just rely on their inherent built-in feature selection capabilities to work out the best of the 159 potential predictors for use. But as it turned out, a manual culling of variables is still necessary to facilitate model fitting and accuracy.   
 
 As such, variables with the following criteria were excluded as predictors from the training dataset :-  
-* variables with no or low variability  
-* variables having more than 70% missing values  
-* variables that are labels and have no relationship with the outcome
+*  variables with no or low variability  
+*  variables having more than 70% missing values  
+*  variables that are labels and have no relationship with the outcome
 
 
 ```{r}
@@ -101,13 +101,13 @@ pmltrn1<-subset(pmltrn, select=rqdvars)
 
 ```
 
-At the end of the feature selection exercise, 52 variables remained to be used for predictor selection in the modelling algorithms. 
+At the end of the feature selection exercise, 52 variables remain to be used for predictor selection in the modelling algorithms. 
 
 
 #### Cross Validation
 * For purpose of providing an out of sample error estimate, the given training dataset will be partitioned into 75% for training the model while 25% is set aside for validation of the model.  
 
-* In the model training function, a 5-fold cross-validation is being use3d. 
+* Within the model training function, a 5-fold cross-validation will be used. 
 
 ```{r}
 # Partition training dataset
